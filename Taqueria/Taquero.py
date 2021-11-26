@@ -52,7 +52,7 @@ class Taquero:
         # This times should be the ones defined in the project
         time_cebolla = 1
         time_cilantro = 1
-        time_guacamale = 1
+        time_guacamole = 1
         time_salsa = 1
         time_meat = 1
 
@@ -77,7 +77,7 @@ class Taquero:
                 sleep(time_cilantro)
 
             if 'guacamole' in part['ingredients']:
-                sleep(time_guacamale)
+                sleep(time_guacamole)
 
             if 'salsa' in part['ingredients']:
                 sleep(time_salsa)
