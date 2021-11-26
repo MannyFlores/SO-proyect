@@ -28,24 +28,41 @@ class Taquero:
         # Time to process taco
         self.quantum = 1
 
-    def get_quesadilla(self):
-        pass
+        # Keep track of rests
+        self.isActive = False
+
+        # Number of tacos completed
+        self.tacos_done = 0
+
+    # This function returns true if a quesadilla is ready
+    # Returns true
+    @staticmethod
+    def get_quesadilla(quesadillero):
+        # Check if quesadillero has quesadillas ready
+        if quesadillero.done_quesadillas:
+            quesadillero.take_quesadilla()
+            return True
+        else:
+            return False
 
     # This function takes care of parts
     # part is a dictionary
-    def process_part(self, part):
+    def process_part(self, part, quesadillero):
         # Time for each ingredient
+        # This times should be the ones defined in the project
         time_cebolla = 1
         time_cilantro = 1
         time_guacamale = 1
         time_salsa = 1
         time_meat = 1
 
-        parts_done = 0
-
         # Check if taco or quesadilla
         if part['type'] is 'quesadilla':
-            self.get_quesadilla()
+            # Check if quesadilla is ready
+            # if the quesadilla is not ready return false
+            # false means the order is not completed
+            if not self.get_quesadilla(quesadillero):
+                return False
 
         # Process each taco in the part
         for i in range(1, part):
@@ -65,9 +82,12 @@ class Taquero:
             if 'salsa' in part['ingredients']:
                 sleep(time_salsa)
 
-            parts_done = i
+            self.tacos_done += 1
 
-        # Update status of part
+        # Update part status
         part['status'] = 'done'
 
-        return part
+        # Insert finished part in the done list
+        self.done_orders.append(part)
+
+        return True
