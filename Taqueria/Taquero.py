@@ -1,19 +1,11 @@
-from time import sleep
-from multiprocessing import Process
+import time
 
 
-class Taquero:
+class Taquero():
     def __init__(self):
-
-        # Log steps
-        # TODO: implement logging
-        self.verbose = False
 
         # Number of maximum orders in the main queue
         self.max_queued_orders = 10
-
-        # Number of maximum orders in the sub queue
-        self.max_sub_queued_orders = 10
 
         # Pool of ingredients
         self.ingredients = {
@@ -30,12 +22,14 @@ class Taquero:
         self.main_queue = []
         self.sub_queue = []
         self.done_orders = []
+        self.process_sub_queue = []
 
         # Time to process taco
-        self.quantum = 1
+        self.quantum = 2
 
         # Keep track of rests
         self.isActive = False
+
         # Mock numbers, the time is defined in the project
         self.rest_time_max = 100
         self.rest_time = 0
@@ -45,110 +39,65 @@ class Taquero:
         # Number of tacos completed
         self.tacos_done = 0
 
-    # This function returns true if a quesadilla is ready
-    # Returns true
-    @staticmethod
-    def get_quesadilla(quesadillero):
-        # Check if quesadillero has quesadillas ready
-        if quesadillero.done_quesadillas:
-            quesadillero.take_quesadilla()
-            return True
-        else:
-            return False
+        self.time_cebolla = 1
+        self.time_cilantro = 1
+        self.time_guacamole = 1
+        self.time_salsa = 1
+        self.time_meat = 1
 
-    # This function takes care of parts
-    # part is a dictionary
-    # quesadillero is an object
-    # chalan is an object
-    # returns True if the order is completed
-    # returns False if the order cannot be completed
-    def process_part(self, part, quesadillero):
-        # Time for each ingredient
-        # This times should be the ones defined in the project
-        time_cebolla = 1
-        time_cilantro = 1
-        time_guacamole = 1
-        time_salsa = 1
-        time_meat = 1
+    def Do_Tacos(self, order_queue):
+        # Take parts if the main queue is not full and the taqueria queue has items.
+        while not order_queue.empty() and len(self.main_queue) < self.max_queued_orders:
+            part = order_queue.get()
+            part["done_ingredients"] = []
+            part["tacos_done"] = 0
+            self.main_queue.append(part)
 
-        # Check if taco or quesadilla
-        if part['type'] is 'quesadilla':
-            # Check if quesadilla is ready
-            # if the quesadilla is not ready return false
-            # false means the order is not completed
-            if not self.get_quesadilla(quesadillero):
-                return False
+        while len(self.main_queue) > 0:
+            # Do taco
+            for part in self.main_queue:
+                print(f"{part['part_id']}: In progress")
+                start_time = time.time()
+                change = False
+                while part["tacos_done"] < part["quantity"]:
 
-        # Process each taco in the part
-        for i in range(1, part):
-            # Add Meat
-            sleep(time_meat)
+                    # Add meat
+                    if "meat" not in part["done_ingredients"]:
+                        time.sleep(self.time_meat)
+                        print(f"{part['part_id']}: Added Meat")
+                        part["done_ingredients"].append("meat")
+                    if time.time() - start_time >= self.quantum: break
 
-            # Check for ingredients in part
-            if 'cebolla' in part['ingredients']:
-                # Check if there is available ingredients
-                # if not the order is put on hold
-                if self.ingredients['cebolla'] > 0:
-                    sleep(time_cebolla)
+                    if "cebolla" not in part["done_ingredients"]:
+                        time.sleep(self.time_cebolla)
+                        print(f"{part['part_id']}: Added Cebolla")
+                        part["done_ingredients"].append("cebolla")
+                    if time.time() - start_time >= self.quantum: break
+
+                    if "cilantro" not in part["done_ingredients"]:
+                        time.sleep(self.time_cilantro)
+                        print(f"{part['part_id']}: Added Cilantro")
+                        part["done_ingredients"].append("cilantro")
+                    if time.time() - start_time >= self.quantum: break
+
+                    if "guacamole" not in part["done_ingredients"]:
+                        time.sleep(self.time_guacamole)
+                        print(f"{part['part_id']}: Added Guacamole")
+                        part["done_ingredients"].append("guacamole")
+                    if time.time() - start_time >= self.quantum: break
+
+                    if "salsa" not in part["done_ingredients"]:
+                        time.sleep(self.time_salsa)
+                        print(f"{part['part_id']}: Added Salsa")
+                        part["done_ingredients"].append("salsa")
+                    if time.time() - start_time >= self.quantum: break
+
+                    part["tacos_done"] += 1
+
+                if part["tacos_done"] == part["quantity"]:
+
+                    print(f"{part['part_id']}: Done")
+                    self.done_orders.append(part)
+                    self.main_queue.remove(part)
                 else:
-                    return False
-
-            if 'cilantro' in part['ingredients']:
-                # Check if there is available ingredients
-                # if not the order is put on hold
-                if self.ingredients['cebolla'] > 0:
-                    sleep(time_cebolla)
-                else:
-                    return False
-
-            if 'guacamole' in part['ingredients']:
-                # Check if there is available ingredients
-                # if not the order is put on hold
-                if self.ingredients['cebolla'] > 0:
-                    sleep(time_cebolla)
-                else:
-                    return False
-
-            if 'salsa' in part['ingredients']:
-                # Check if there is available ingredients
-                # if not the order is put on hold
-                if self.ingredients['cebolla'] > 0:
-                    sleep(time_cebolla)
-                else:
-                    return False
-
-            self.tacos_done += 1
-
-        # Update part status
-        part['status'] = 'done'
-
-        # Insert finished part in the done list
-        self.done_orders.append(part)
-
-        return True
-
-    # This function handles incoming orders and calls the auxiliary necessary functions
-    def handle_orders(self, order_queue, quesadillero, chalan):
-        # Work if the order queue has orders and the Taquero is not resting
-        while order_queue and self.active_time < self.active_time_max:
-            # Get an order from the order queue
-            self.main_queue.append(order_queue.get())
-
-            # Pass order to the sub queue if its not full
-            # The sub queue holds process for each part
-            if len(self.sub_queue) < self.max_sub_queued_orders:
-                # Create a process with a part from the main queue
-                p = Process(target=self.process_part, args=(self.main_queue.pop()))
-                p.start()
-                p.join()
-                self.sub_queue.append(p)
-
-            # Work on the sub queue
-            # The parts are going to be worked on using round robin
-            # The time each part of the order is worked on is defined by self.quantum
-            # TODO: implement round robin for self.sub_queue
-
-            # The chalan needs to check if an order was not completed
-            # If the order is not completed, check the ingredient pool
-            # The chalan should be another process, this so the Taquero can work in other parts
-            # TODO: implement chalan ingredient checks
+                    print(f"{part['part_id']}: Suspended")

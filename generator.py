@@ -25,7 +25,7 @@ class Generator:
                 ingredients.append(ingredient)
 
         # number of tacos 1 - 100
-        quantity = random.randint(1, 100)
+        quantity = random.randint(1, 5)
 
         # Picks a random type ['taco', 'quesadilla']
         taco_type = random.choice(self.type)
@@ -57,5 +57,5 @@ class Generator:
 
         self.order_count += 1
 
-        pprint.pprint(out)
+        # pprint.pprint(out)
         return out
