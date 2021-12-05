@@ -20,10 +20,8 @@ class Repartidor():
                         self.Asada_Suadero_1.put(part)
                     else:
                         self.Asada_Suadero_2.put(part)
-
-                if part["meat"] == "adobada":
+                elif part["meat"] == "adobada":
                     self.Adobada.put(part)
-
-                if part["meat"] == "tripa" or part["meat"] == "cabeza":
+                elif part["meat"] == "tripa" or part["meat"] == "cabeza":
                     self.Tripa_Cabeza.put(part)
 

@@ -38,30 +38,10 @@ class Taquero():
         # How many ingredients until refill
         self.ingredient_threshold = 10
 
-        self.time_cebolla = 0.5
-        self.time_cilantro = 0.5
-        self.time_guacamole = 0.5
-        self.time_salsa = 0.5
-        self.time_meat = 1
-
-        self.needIngredients = False
-
         self.fan_time = 0
         self.fan = False
 
         self.rest_time = 0
-
-    def check_ingredients(self):
-        if self.ingredients["cebolla"] < self.ingredient_threshold:
-            self.needIngredients = True
-        if self.ingredients["cilantro"] < self.ingredient_threshold:
-            self.needIngredients = True
-        if self.ingredients["guacamole"] < self.ingredient_threshold:
-            self.needIngredients = True
-        if self.ingredients["salsa"] < self.ingredient_threshold:
-            self.needIngredients = True
-        if self.tortillas < self.ingredient_threshold:
-            self.needIngredients = True
 
     def Do_Tacos(self, order_queue):
         while True:
@@ -69,9 +49,6 @@ class Taquero():
             while not order_queue.empty() and len(self.main_queue) < self.max_queued_orders and self.isActive:
                 # Take a part from the queue
                 part = order_queue.get()
-                # Keep track of ingredients done in the part
-                part["done_ingredients"] = []
-                # Keep track of how many tacos are done in the part
                 part["tacos_done"] = 0
                 print(f"{self.name} Refilling queue with part: {part['part_id']}")
                 # Add to the main queue
@@ -100,36 +77,8 @@ class Taquero():
                         if self.tortillas == 0:
                             break
 
-                        # Add meat
-                        if "meat" not in part["done_ingredients"]:
-                            time.sleep(self.time_meat)
-                            print(f"{self.name} {part['part_id']}: Added Meat")
-                            part["done_ingredients"].append("meat")
-                        if time.time() - start_time >= self.quantum: break
-
-                        if "cebolla" not in part["done_ingredients"] and self.ingredients["cebolla"] > 0:
-                            time.sleep(self.time_cebolla)
-                            print(f"{self.name} {part['part_id']}: Added Cebolla")
-                            part["done_ingredients"].append("cebolla")
-                        if time.time() - start_time >= self.quantum: break
-
-                        if "cilantro" not in part["done_ingredients"] and self.ingredients["cebolla"] > 0:
-                            time.sleep(self.time_cilantro)
-                            print(f"{self.name} {part['part_id']}: Added Cilantro")
-                            part["done_ingredients"].append("cilantro")
-                        if time.time() - start_time >= self.quantum: break
-
-                        if "guacamole" not in part["done_ingredients"] and self.ingredients["cebolla"] > 0:
-                            time.sleep(self.time_guacamole)
-                            print(f"{self.name} {part['part_id']}: Added Guacamole")
-                            part["done_ingredients"].append("guacamole")
-                        if time.time() - start_time >= self.quantum: break
-
-                        if "salsa" not in part["done_ingredients"] and self.ingredients["cebolla"] > 0:
-                            time.sleep(self.time_salsa)
-                            print(f"{self.name} {part['part_id']}: Added Salsa")
-                            part["done_ingredients"].append("salsa")
-                        if time.time() - start_time >= self.quantum: break
+                        # Make Quesadillas
+                        time.sleep(1.5)
 
                         part["tacos_done"] += 1
                         self.tacos_done += 1
