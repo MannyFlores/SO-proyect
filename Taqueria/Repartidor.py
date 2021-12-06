@@ -14,6 +14,10 @@ class Repartidor():
             order["status"] = "In Progress"
 
             for part in order["orden"]:
+                if part["type"] == "quesadilla":
+                    print("Added quesadilla")
+                    self.Quesadillero.put(part)
+
                 if part["meat"] == "asada" or part["meat"] == "suadero":
                     # Check queue lengths of taqueros
                     if self.Asada_Suadero_2.qsize() > self.Asada_Suadero_1.qsize():
