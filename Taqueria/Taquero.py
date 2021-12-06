@@ -66,7 +66,7 @@ class Taquero():
         if self.tortillas < self.ingredient_threshold:
             self.needIngredients = True
 
-    def Do_Tacos(self, order_queue, quesadillas_done):
+    def Do_Tacos(self, order_queue, quesadillas_done, done_part_queue):
         logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
         while True:
             # Take parts if the main queue is not full and the taqueria queue has items.
@@ -84,11 +84,7 @@ class Taquero():
                 self.main_queue.append(part)
 
             # Work on main queue
-            all_completed = True
-            while all_completed and self.isActive:
-
-                if len(self.main_queue) < 2:
-                    break
+            while self.isActive:
 
                 # Check if needs rest
                 if self.tacos_done % 1000 == 0:
@@ -108,21 +104,10 @@ class Taquero():
                     logging.debug(f"{self.name} {part['part_id']}: In progress")
                     start_time = time.time()
 
-                    # Check if needs quesadilla
-                    if part["type"] == "quesadilla":
-                        if quesadillas_done.empty():
-                            all_completed = False
-                            logging.debug(f"{self.name} {part['part_id']}: Necesita Quesadilla")
-                            continue
-                        else:
-                            logging.debug(f"{self.name} {part['part_id']}: Quesadilla terminada")
-                            quesadillas_done.get()
-
                     while part["tacos_done"] < part["quantity"]:
 
                         # Check for tortillas
                         if self.tortillas == 0:
-                            all_completed = False
                             break
 
                         # Add meat
@@ -157,11 +142,13 @@ class Taquero():
                         if time.time() - start_time >= self.quantum: break
 
                         part["tacos_done"] += 1
+                        part["done_ingredients"] = []
                         self.tacos_done += 1
 
                     if part["tacos_done"] == part["quantity"]:
                         logging.debug(f"{self.name} {part['part_id']}: Done")
-                        self.done_orders.append(part)
+                        part["status"] = 'done'
+                        done_part_queue.put(part)
                         self.main_queue.remove(part)
                     else:
                         logging.debug(f"{self.name} {part['part_id']}: Suspended")

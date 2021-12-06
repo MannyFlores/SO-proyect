@@ -4,19 +4,24 @@ import pprint
 
 
 # This script generates random mock orders to test the scheduling algorithm
+import time
+
+
 class Generator:
     def __init__(self):
         self.taco_meat = ['asada', 'adobada', 'suadero', 'cabeza', 'tripa']
         self.ingredients = ['cebolla', 'cilantro', 'salsa', 'guacamole']
         self.type = ['taco', 'quesadilla']
         self.order_count = 1
-        self.max_parts = 10
+        self.max_parts = 5
 
     # This function generates a part from the order
     # returns a dictionary
     def generate_taco(self, part_num):
         # ['asada', 'adobada', 'suadero', 'cabeza', 'tripa']
         meat = random.choice(self.taco_meat)
+
+        random.seed(time.time())
 
         # Picks random ingredients ['cebolla', 'cilantro', 'salsa', 'guacamole']
         ingredients = []

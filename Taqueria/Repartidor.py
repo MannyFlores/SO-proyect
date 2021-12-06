@@ -7,7 +7,7 @@ class Repartidor():
         self.Adobada = adobada
         self.Quesadillero = quesadillas
 
-    def Repartir(self, order_queue):
+    def Repartir(self, order_queue, incomplete_order_queue):
         while True:
             order = order_queue.get()
 
@@ -29,3 +29,4 @@ class Repartidor():
                 elif part["meat"] == "tripa" or part["meat"] == "cabeza":
                     self.Tripa_Cabeza.put(part)
 
+            incomplete_order_queue.put(order)
