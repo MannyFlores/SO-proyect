@@ -3,6 +3,7 @@ from Taqueria.Taquero import Taquero
 from Taqueria.Repartidor import Repartidor
 from Taqueria.Quesadillero import Quesadillero
 from Taqueria.Armador import Armador
+from Taqueria.Chalan import Chalan
 import multiprocessing
 
 
@@ -13,7 +14,7 @@ def main():
     orden_queue = multiprocessing.Queue()
 
     # Generate Random orders
-    for i in range(1, 10):
+    for i in range(1, 5):
         orden = order_generator.generate_order()
         print(orden)
         orden_queue.put(orden)
@@ -34,6 +35,10 @@ def main():
     # Ordenes incompletas
     incomplete_order_queue = multiprocessing.Queue()
 
+    # Queues de ingredientes
+    ingrediente_queue_1 = multiprocessing.Queue()
+    ingrediente_queue_2 = multiprocessing.Queue()
+
     # Create Repartidor
     repartidor = Repartidor(asada_suadero_1_queue, asada_suadero_2_queue, adobada_queue, quesadillas_queue, cabeza_tripa_queue)
     repartidor_processes = multiprocessing.Process(target=repartidor.Repartir, args=(orden_queue, incomplete_order_queue, ))
@@ -51,23 +56,34 @@ def main():
 
     # Asada 1
     taquero_asada = Taquero(name="Asada_1", meat="Asada-Suadero", quesadillero=quesadillero)
-    asada_1 = multiprocessing.Process(target=taquero_asada.Do_Tacos, args=(repartidor.Asada_Suadero_1, quesadillas_terminadas, done_part_queue, ))
+    asada_1 = multiprocessing.Process(target=taquero_asada.Do_Tacos, args=(repartidor.Asada_Suadero_1, quesadillas_terminadas, done_part_queue, ingrediente_queue_1, ))
     asada_1.start()
 
     # Asada 2
     taquero_asada_2 = Taquero(name="Asada_2", meat="Asada-Suadero", quesadillero=quesadillero)
-    asada_2 = multiprocessing.Process(target=taquero_asada_2.Do_Tacos, args=(repartidor.Asada_Suadero_2, quesadillas_terminadas, done_part_queue, ))
+    asada_2 = multiprocessing.Process(target=taquero_asada_2.Do_Tacos, args=(repartidor.Asada_Suadero_2, quesadillas_terminadas, done_part_queue, ingrediente_queue_1,))
     asada_2.start()
 
     # Adobada
     taquero_adobada = Taquero(name="Adobada", meat="Adobada", quesadillero=quesadillero)
-    adobada = multiprocessing.Process(target=taquero_adobada.Do_Tacos, args=(repartidor.Adobada, quesadillas_terminadas, done_part_queue, ))
+    adobada = multiprocessing.Process(target=taquero_adobada.Do_Tacos, args=(repartidor.Adobada, quesadillas_terminadas, done_part_queue, ingrediente_queue_2, ))
     adobada.start()
 
     # Cabeza Tripa
     taquero_cabeza = Taquero(name="Cabeza_Tripa", meat="Cabeza_Tripa", quesadillero=quesadillero)
-    cabeza = multiprocessing.Process(target=taquero_cabeza.Do_Tacos, args=(repartidor.Tripa_Cabeza, quesadillas_terminadas, done_part_queue, ))
+    cabeza = multiprocessing.Process(target=taquero_cabeza.Do_Tacos, args=(repartidor.Tripa_Cabeza, quesadillas_terminadas, done_part_queue, ingrediente_queue_2, ))
     cabeza.start()
+
+
+
+    # Chalanes
+    chalan_1 = Chalan()
+    chalan_1_process = multiprocessing.Process(target=chalan_1.CheckIngredients, args=(ingrediente_queue_1, ))
+    chalan_1_process.start()
+
+    chalan_2 = Chalan()
+    chalan_2_process = multiprocessing.Process(target=chalan_2.CheckIngredients, args=(ingrediente_queue_2, ))
+    chalan_2_process.start()
 
     
 if __name__ == '__main__':
