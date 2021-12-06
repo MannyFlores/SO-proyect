@@ -10,6 +10,6 @@ class Quesadillero:
 
             part = order_queue.get()
 
-            for i in range(0, part["quanitity"]):
-                time.sleep(20)
+            for i in range(0, part["quantity"]):
+                time.sleep(1)
                 quesadillas_queue.put(1)

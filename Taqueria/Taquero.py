@@ -7,7 +7,7 @@ class Taquero:
     def __init__(self, name, meat, quesadillero):
 
         # Number of maximum orders in the main queue
-        self.max_queued_orders = 10
+        self.max_queued_orders = 5
 
         self.name = name
 
@@ -119,7 +119,7 @@ class Taquero:
                 self.main_queue.append(part)
 
             # Work on main queue
-            while self.isActive:
+            while self.isActive and len(self.main_queue) != 0:
 
                 # Check if needs rest
                 if self.tacos_done % 1000 == 0:
@@ -142,7 +142,6 @@ class Taquero:
                     self.check_ingredients(ingredient_queue)
 
                     while part["tacos_done"] < part["quantity"]:
-
                         # Check for tortillas
                         if self.tortillas == 0:
                             break

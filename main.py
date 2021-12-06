@@ -1,3 +1,5 @@
+import time
+
 from generator import Generator
 from Taqueria.Taquero import Taquero
 from Taqueria.Repartidor import Repartidor
@@ -13,11 +15,7 @@ def main():
     # Main Queue
     orden_queue = multiprocessing.Queue()
 
-    # Generate Random orders
-    for i in range(1, 5):
-        orden = order_generator.generate_order()
-        print(orden)
-        orden_queue.put(orden)
+
 
     # Sub Queues
     asada_suadero_1_queue = multiprocessing.Queue()
@@ -85,6 +83,10 @@ def main():
     chalan_2_process = multiprocessing.Process(target=chalan_2.CheckIngredients, args=(ingrediente_queue_2, ))
     chalan_2_process.start()
 
+    while True:
+        start_time = time.time()
+        while time.time() - start_time < 1:
+            orden_queue.put(order_generator.generate_order())
     
 if __name__ == '__main__':
     main()

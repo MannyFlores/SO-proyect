@@ -50,7 +50,7 @@ class Generator:
 
         # Generate taco orders
         orden = []
-        for i in range(1, random.randint(1, self.max_parts)):
+        for i in range(1, random.randint(2, self.max_parts)):
             orden.append(self.generate_taco(part_num=i))
 
         out = {

@@ -15,7 +15,6 @@ class Repartidor():
 
             for part in order["orden"]:
                 if part["type"] == "quesadilla":
-                    print("Added quesadilla")
                     self.Quesadillero.put(part)
 
                 if part["meat"] == "asada" or part["meat"] == "suadero":
