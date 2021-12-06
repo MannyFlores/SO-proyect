@@ -1,8 +1,9 @@
+import logging
+import sys
 import time
-import logging, sys
 
 
-class Taquero():
+class Taquero:
     def __init__(self, name, meat, quesadillero):
 
         # Number of maximum orders in the main queue
@@ -39,7 +40,7 @@ class Taquero():
         self.done_orders = []
 
         # How many ingredients until refill
-        self.ingredient_threshold = 10
+        self.ingredient_threshold = 0
 
         self.time_cebolla = 0.5
         self.time_cilantro = 0.5
@@ -54,19 +55,53 @@ class Taquero():
 
         self.rest_time = 0
 
-    def check_ingredients(self):
-        if self.ingredients["cebolla"] < self.ingredient_threshold:
-            self.needIngredients = True
-        if self.ingredients["cilantro"] < self.ingredient_threshold:
-            self.needIngredients = True
-        if self.ingredients["guacamole"] < self.ingredient_threshold:
-            self.needIngredients = True
-        if self.ingredients["salsa"] < self.ingredient_threshold:
-            self.needIngredients = True
-        if self.tortillas < self.ingredient_threshold:
-            self.needIngredients = True
+    def check_ingredients(self, ingredient_queue):
+        if self.ingredients["cebolla"]  <= self.ingredient_threshold:
+            found = False
+            logging.debug(f"{self.name}, esperando cebolla")
+            while not found:
+                ingredient = ingredient_queue.get()
+                if ingredient == "cebolla":
+                    self.ingredients["cebolla"] = 200
+                    found = True
 
-    def Do_Tacos(self, order_queue, quesadillas_done, done_part_queue):
+        if self.ingredients["cilantro"] <= self.ingredient_threshold:
+            found = False
+            logging.debug(f"{self.name}, esperando cilantro")
+            while not found:
+                ingredient = ingredient_queue.get()
+                if ingredient == "cilantro":
+                    self.ingredients["cilantro"] = 200
+                    found = True
+
+        if self.ingredients["guacamole"]  <= self.ingredient_threshold:
+            found = False
+            logging.debug(f"{self.name}, esperando guacamole")
+            while not found:
+                ingredient = ingredient_queue.get()
+                if ingredient == "guacamole":
+                    self.ingredients["guacamole"] = 100
+                    found = True
+
+        if self.ingredients["salsa"] <= self.ingredient_threshold:
+            found = False
+            logging.debug(f"{self.name}, esperando salsa")
+            while not found:
+                ingredient = ingredient_queue.get()
+                if ingredient == "salsa":
+                    self.ingredients["salsa"] = 150
+                    found = True
+
+        if self.tortillas <= self.ingredient_threshold:
+            found = False
+            logging.debug(f"{self.name}, esperando tortillas")
+            while not found:
+                ingredient = ingredient_queue.get()
+                if ingredient == "salsa":
+                    self.tortillas = 50
+                    found = True
+
+    def Do_Tacos(self, order_queue, quesadillas_done, done_part_queue, ingredient_queue):
         logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)
         while True:
             # Take parts if the main queue is not full and the taqueria queue has items.
@@ -104,6 +139,8 @@ class Taquero():
                     logging.debug(f"{self.name} {part['part_id']}: In progress")
                     start_time = time.time()
 
+                    self.check_ingredients(ingredient_queue)
+
                     while part["tacos_done"] < part["quantity"]:
 
                         # Check for tortillas
@@ -117,28 +154,32 @@ class Taquero():
                             part["done_ingredients"].append("meat")
                         if time.time() - start_time >= self.quantum: break
 
-                        if "cebolla" not in part["done_ingredients"] and self.ingredients["cebolla"] > 0:
+                        if "cebolla" not in part["done_ingredients"] and self.ingredients["cebolla"] > 0 and "cebolla" in part["ingredients"]:
                             time.sleep(self.time_cebolla)
                             logging.debug(f"{self.name} {part['part_id']}: Added Cebolla")
                             part["done_ingredients"].append("cebolla")
+                            self.ingredients["cebolla"] -= 1
                         if time.time() - start_time >= self.quantum: break
 
-                        if "cilantro" not in part["done_ingredients"] and self.ingredients["cebolla"] > 0:
+                        if "cilantro" not in part["done_ingredients"] and self.ingredients["cilantro"] > 0 and "cilantro" in part["ingredients"]:
                             time.sleep(self.time_cilantro)
                             logging.debug(f"{self.name} {part['part_id']}: Added Cilantro")
                             part["done_ingredients"].append("cilantro")
+                            self.ingredients["cilantro"] -= 1
                         if time.time() - start_time >= self.quantum: break
 
-                        if "guacamole" not in part["done_ingredients"] and self.ingredients["cebolla"] > 0:
+                        if "guacamole" not in part["done_ingredients"] and self.ingredients["guacamole"] > 0 and "guacamole" in part["ingredients"]:
                             time.sleep(self.time_guacamole)
                             logging.debug(f"{self.name} {part['part_id']}: Added Guacamole")
                             part["done_ingredients"].append("guacamole")
+                            self.ingredients["guacamole"] -= 1
                         if time.time() - start_time >= self.quantum: break
 
-                        if "salsa" not in part["done_ingredients"] and self.ingredients["cebolla"] > 0:
+                        if "salsa" not in part["done_ingredients"] and self.ingredients["salsa"] > 0 and "salsa" in part["ingredients"]:
                             time.sleep(self.time_salsa)
                             logging.debug(f"{self.name} {part['part_id']}: Added Salsa")
                             part["done_ingredients"].append("salsa")
+                            self.ingredients["salsa"] -= 1
                         if time.time() - start_time >= self.quantum: break
 
                         part["tacos_done"] += 1
