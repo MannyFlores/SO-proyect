@@ -21,10 +21,11 @@ class Armador:
             except:
                 print(f" Orders Per Minute: 0 ")
 
-
+            # Mientras el repartidor siga mandando ordenes, guarda una copia en self.incomplete_orders
             while not incomplete_order_queue.empty():
                 self.incomplete_orders.append(incomplete_order_queue.get())
 
+            # part es una parte de la queue
             part = done_parts_queue.get()
 
             found = False
@@ -36,6 +37,7 @@ class Armador:
                         incomplete_part["status"] = 'done'
                         found = True
 
+            # Revisar que este completa la orden
             for order in self.incomplete_orders:
                 isdone = True
                 for incomplete_part in order["orden"]:
@@ -60,4 +62,3 @@ class Armador:
                 done_parts_queue.put(part)
 
                 # turnaround time
-

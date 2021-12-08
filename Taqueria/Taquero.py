@@ -36,9 +36,6 @@ class Taquero:
         # Number of tacos completed
         self.tacos_done = 1
 
-        # Parts finished
-        self.done_orders = []
-
         # How many ingredients until refill
         self.ingredient_threshold = 0
 
@@ -56,7 +53,7 @@ class Taquero:
         self.rest_time = 0
 
     def check_ingredients(self, ingredient_queue):
-        if self.ingredients["cebolla"]  <= self.ingredient_threshold:
+        if self.ingredients["cebolla"] <= self.ingredient_threshold:
             found = False
             logging.debug(f"{self.name}, esperando cebolla")
             while not found:
@@ -64,6 +61,8 @@ class Taquero:
                 if ingredient == "cebolla":
                     self.ingredients["cebolla"] = 200
                     found = True
+                else:
+                    ingredient_queue.put(ingredient_queue.get())
 
         if self.ingredients["cilantro"] <= self.ingredient_threshold:
             found = False
@@ -73,6 +72,8 @@ class Taquero:
                 if ingredient == "cilantro":
                     self.ingredients["cilantro"] = 200
                     found = True
+                else:
+                    ingredient_queue.put(ingredient_queue.get())
 
         if self.ingredients["guacamole"]  <= self.ingredient_threshold:
             found = False
@@ -82,6 +83,8 @@ class Taquero:
                 if ingredient == "guacamole":
                     self.ingredients["guacamole"] = 100
                     found = True
+                else:
+                    ingredient_queue.put(ingredient_queue.get())
 
         if self.ingredients["salsa"] <= self.ingredient_threshold:
             found = False
@@ -91,6 +94,8 @@ class Taquero:
                 if ingredient == "salsa":
                     self.ingredients["salsa"] = 150
                     found = True
+                else:
+                    ingredient_queue.put(ingredient_queue.get())
 
         if self.tortillas <= self.ingredient_threshold:
             found = False
@@ -100,6 +105,8 @@ class Taquero:
                 if ingredient == "salsa":
                     self.tortillas = 50
                     found = True
+                else:
+                    ingredient_queue.put(ingredient_queue.get())
 
     def Do_Tacos(self, order_queue, quesadillas_done, done_part_queue, ingredient_queue):
         logging.basicConfig(stream=sys.stderr, level=logging.DEBUG)

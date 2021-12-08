@@ -15,8 +15,6 @@ def main():
     # Main Queue
     orden_queue = multiprocessing.Queue()
 
-
-
     # Sub Queues
     asada_suadero_1_queue = multiprocessing.Queue()
     asada_suadero_2_queue = multiprocessing.Queue()
@@ -27,13 +25,13 @@ def main():
     # Quesadillas Terminadas queue
     quesadillas_terminadas = multiprocessing.Queue()
 
-    # Ordenes terminadas queue
+    # Todos los taqueros ponen sus parte terminada aqui
     done_part_queue = multiprocessing.Queue()
 
-    # Ordenes incompletas
+    # Ordenes incompletas - el repartidor manda una copia de la orden al armador por esta queue
     incomplete_order_queue = multiprocessing.Queue()
 
-    # Queues de ingredientes
+    # Queues de ingredientes - los chalanes mandan paquetes de ingredientes por estas queues
     ingrediente_queue_1 = multiprocessing.Queue()
     ingrediente_queue_2 = multiprocessing.Queue()
 
@@ -71,8 +69,6 @@ def main():
     taquero_cabeza = Taquero(name="Cabeza_Tripa", meat="Cabeza_Tripa", quesadillero=quesadillero)
     cabeza = multiprocessing.Process(target=taquero_cabeza.Do_Tacos, args=(repartidor.Tripa_Cabeza, quesadillas_terminadas, done_part_queue, ingrediente_queue_2, ))
     cabeza.start()
-
-
 
     # Chalanes
     chalan_1 = Chalan()
