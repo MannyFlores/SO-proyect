@@ -82,7 +82,9 @@ def main():
     while True:
         start_time = time.time()
         while time.time() - start_time < 1:
-            orden_queue.put(order_generator.generate_order())
+            orden = order_generator.generate_order()
+            # print(orden)
+            orden_queue.put(orden)
     
 if __name__ == '__main__':
     main()
